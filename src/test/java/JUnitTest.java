@@ -41,7 +41,7 @@ public class JUnitTest {
     }
 
     @Test
-    public void name() throws Exception {
+    public void tString2Object() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String testString = objectMapper.writeValueAsString(new TestObject());
 
