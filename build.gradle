@@ -2,10 +2,18 @@ plugins {
     id 'java'
 }
 
-group 'yearnlune.lab'
-version '1.0.0'
+def getGitRevision = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-list', '--count', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
 
-sourceCompatibility = 1.8
+group = 'yearnlune.lab'
+version = "0.0.${getGitRevision()}"
+sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
