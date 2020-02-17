@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+    }
+}
+
 plugins {
     id 'java'
 }
+
+apply plugin: 'com.jfrog.bintray'
 
 def getGitRevision = { ->
     def stdout = new ByteArrayOutputStream()
@@ -27,4 +38,28 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+Properties properties = new Properties()
+File propFile = project.rootProject.file(System.properties['user.home'] + "/local.properties")
+if (propFile.exists()) {
+    properties.load(propFile.newDataInputStream())
+}else{
+    properties.put("artifactory.username", System.getenv("ARTIFACTORY_USERNAME"))
+    properties.put("artifactory.password", System.getenv("ARTIFACTORY_PASSWORD"))
+}
+
+bintray {
+    user = properties.getProperty("artifactory.username", "")
+    key =  properties.getProperty("artifactory.password", "")
+    pkg {
+        repo = 'maven'
+        name = rootProject.name
+        userOrg = properties.getProperty("artifactory.username", "")
+        vcsUrl = "${properties.getProperty("artifactory.github", "")}/${rootProject.name}.git"
+        issueTrackerUrl = "${properties.getProperty("artifactory.github", "")}/${rootProject.name}/issues"
+        version {
+            name = "0.0.${getGitRevision()}"
+        }
+    }
 }
