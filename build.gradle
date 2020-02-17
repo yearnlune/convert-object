@@ -11,6 +11,7 @@ plugins {
     id 'java'
 }
 
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def getGitRevision = { ->
@@ -52,14 +53,34 @@ if (propFile.exists()) {
 bintray {
     user = properties.getProperty("artifactory.username", "")
     key =  properties.getProperty("artifactory.password", "")
+    publications = ['mavenPublication']
+
     pkg {
         repo = 'maven'
         name = rootProject.name
         userOrg = properties.getProperty("artifactory.username", "")
+        licenses = ["Apache-2.0"]
+        publicDownloadNumbers = true
+        websiteUrl = 'https://yearnlune.github.io/'
         vcsUrl = "${properties.getProperty("artifactory.github", "")}/${rootProject.name}.git"
         issueTrackerUrl = "${properties.getProperty("artifactory.github", "")}/${rootProject.name}/issues"
+        githubRepo = "yearnlune/${rootProject.name}"
         version {
             name = "0.0.${getGitRevision()}"
+            desc = "0.0.${getGitRevision()}"
+            released  = new Date()
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            groupId = group
+            artifactId = rootProject.name
+            version = version
+
+            from components.java
         }
     }
 }
