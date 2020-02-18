@@ -31,6 +31,10 @@ repositories {
     mavenCentral()
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allSource
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter:2.1.4.RELEASE'
     implementation 'org.springframework.data:spring-data-commons:2.1.4.RELEASE'
@@ -80,6 +84,9 @@ publishing {
             artifactId = rootProject.name
             version = version
 
+            artifact sourcesJar {
+                classifier "sources"
+            }
             from components.java
         }
     }
