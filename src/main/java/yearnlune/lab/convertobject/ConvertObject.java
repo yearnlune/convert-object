@@ -85,6 +85,12 @@ public class ConvertObject {
         return object.getClass().isAssignableFrom(tClass) ? (T) object : null ;
     }
 
+    public static <S, T> T object2Object(S s, Class<T> tClass) {
+        T t = getInstance(tClass);
+        BeanUtils.copyProperties(s, t);
+        return t;
+    }
+
     public static <T, S> List<T> objectListToObjectList(List<S> objectList, Class<T> tClass) {
         return objectCollection2ObjectList(objectList, tClass);
     }
