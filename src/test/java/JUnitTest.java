@@ -1,8 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,6 +8,7 @@ import yearnlune.lab.convertobject.ConvertObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 /**
  * Project : convert-object
@@ -21,37 +20,30 @@ import java.util.Date;
 @Slf4j
 public class JUnitTest {
 
-    @JsonDeserialize
+    @Setter
     @Getter
+    @EqualsAndHashCode
+    @JsonDeserialize
     @NoArgsConstructor
     public static class TestObject {
         private String id;
 
         private String name;
 
+        private Integer age;
+
         private String createdAt;
 
+        private Date updatedAt;
+
         @Builder
-        public TestObject(String id, String name, String createdAt) {
+        public TestObject(String id, String name, Integer age, String createdAt, Date updatedAt) {
             this.id = id;
             this.name = name;
+            this.age = age;
             this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof TestObject) {
-                if (!this.id.equals(((TestObject) obj).id)) {
-                    return false;
-                }
-                if (!this.createdAt.equals(((TestObject) obj).createdAt)) {
-                    return false;
-                }
-                return this.name.equals(((TestObject) obj).name);
-            }
-            return super.equals(obj);
-        }
-
     }
 
     @JsonDeserialize
@@ -110,5 +102,25 @@ public class JUnitTest {
 
         ResultObject resultObject = ConvertObject.string2Object(testString, ResultObject.class, "yyyy-MM-dd");
         Assert.assertNotNull(resultObject.getCreatedAt());
+    }
+
+    @Test
+    public void tLinkedHashMapToObject() throws Exception {
+        Date today = new Date();
+        LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
+
+        linkedHashMap.put("id", "TEST_ID");
+        linkedHashMap.put("name", "TESTER");
+        linkedHashMap.put("age", 123123);
+        linkedHashMap.put("updatedAt", today);
+
+        TestObject testObject = ConvertObject.linkedHashMapToObject(linkedHashMap, TestObject.class);
+        TestObject targetObject = TestObject.builder()
+                .id("TEST_ID")
+                .name("TESTER")
+                .age(123123)
+                .updatedAt(today)
+                .build();
+        Assert.assertEquals(testObject, targetObject);
     }
 }

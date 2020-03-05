@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,7 +32,7 @@ public class ConvertObject {
         return null;
     }
 
-    private static <T,S> List<T> objectCollection2ObjectList(Collection<S> objectCollection, Class<T> tClass) {
+    private static <S, T> List<T> objectCollection2ObjectList(Collection<S> objectCollection, Class<T> tClass) {
         List<T> tList = new ArrayList<>();
         for (S s : objectCollection) {
             T t = getInstance(tClass);
@@ -82,7 +85,7 @@ public class ConvertObject {
     }
 
     public static <T> T objectClass2Object(Object object, Class<T> tClass) {
-        return object.getClass().isAssignableFrom(tClass) ? (T) object : null ;
+        return object.getClass().isAssignableFrom(tClass) ? (T) object : null;
     }
 
     public static <S, T> T object2Object(S s, Class<T> tClass) {
@@ -91,13 +94,51 @@ public class ConvertObject {
         return t;
     }
 
-    public static <T, S> List<T> objectListToObjectList(List<S> objectList, Class<T> tClass) {
+    public static <S, T> List<T> objectListToObjectList(List<S> objectList, Class<T> tClass) {
         return objectCollection2ObjectList(objectList, tClass);
     }
 
-    public static <T, S> List<T> objectSetToObjectList(Set<S> objectList, Class<T> tClass) {
+    public static <S, T> List<T> objectSetToObjectList(Set<S> objectList, Class<T> tClass) {
         return objectCollection2ObjectList(objectList, tClass);
     }
 
+    public static <T> T linkedHashMapToObject(LinkedHashMap linkedHashMap, Class<T> tClass) {
+        T t = getInstance(tClass);
 
+        for (Method method : tClass.getDeclaredMethods()) {
+            String methodName = method.getName();
+            if (isSetter(methodName, tClass)) {
+                String fieldName = extractFieldNameAtMethodName(methodName, 3);
+                linkedHashMap.computeIfPresent(fieldName, (key, value) -> {
+                    try {
+                        System.out.println("INVOKE !! (METHOD, FIELD_NAME, FIELD_VALUE) : (" + methodName + ", " + fieldName + ", " + value + ")");
+                        method.invoke(t, value);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                });
+            }
+        }
+
+        return t;
+    }
+
+    private static <T> boolean isSetter(String methodName, Class<T> tClass) {
+        if (methodName.substring(0, 3).equals("set")) {
+            String expectedFieldName = extractFieldNameAtMethodName(methodName, 3);
+
+            for (Field field : tClass.getDeclaredFields()) {
+                if (field.getName().equals(expectedFieldName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static String extractFieldNameAtMethodName(String methodName, int keywordLength) {
+        String fieldName = methodName.substring(keywordLength);
+        return fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
+    }
 }
