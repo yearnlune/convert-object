@@ -105,7 +105,7 @@ public class JUnitTest {
     }
 
     @Test
-    public void tLinkedHashMapToObject() throws Exception {
+    public void tMapToObject() throws Exception {
         Date today = new Date();
         LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
 
@@ -114,7 +114,7 @@ public class JUnitTest {
         linkedHashMap.put("age", 123123);
         linkedHashMap.put("updatedAt", today);
 
-        TestObject testObject = ConvertObject.linkedHashMapToObject(linkedHashMap, TestObject.class);
+        TestObject testObject = ConvertObject.mapToObject(linkedHashMap, TestObject.class);
         TestObject targetObject = TestObject.builder()
                 .id("TEST_ID")
                 .name("TESTER")

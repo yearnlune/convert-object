@@ -102,16 +102,16 @@ public class ConvertObject {
         return objectCollection2ObjectList(objectList, tClass);
     }
 
-    public static <T> T linkedHashMapToObject(LinkedHashMap linkedHashMap, Class<T> tClass) {
+    public static <T> T mapToObject(Map map, Class<T> tClass) {
         T t = getInstance(tClass);
 
         for (Method method : tClass.getDeclaredMethods()) {
             String methodName = method.getName();
             if (isSetter(methodName, tClass)) {
                 String fieldName = extractFieldNameAtMethodName(methodName, 3);
-                linkedHashMap.computeIfPresent(fieldName, (key, value) -> {
+                map.computeIfPresent(fieldName, (key, value) -> {
                     try {
-                        System.out.println("INVOKE !! (METHOD, FIELD_NAME, FIELD_VALUE) : (" + methodName + ", " + fieldName + ", " + value + ")");
+//                        System.out.println("INVOKE !! (METHOD, FIELD_NAME, FIELD_VALUE) : (" + methodName + ", " + fieldName + ", " + value + ")");
                         method.invoke(t, value);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
