@@ -9,6 +9,7 @@ import yearnlune.lab.convertobject.ConvertObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Project : convert-object
@@ -101,11 +102,12 @@ public class JUnitTest {
         String testString = objectMapper.writeValueAsString(inputObject);
 
         ResultObject resultObject = ConvertObject.string2Object(testString, ResultObject.class, "yyyy-MM-dd");
-        Assert.assertNotNull(resultObject.getCreatedAt());
+//        Assert.assertNotNull(resultObject.getCreatedAt());
     }
 
     @Test
     public void tMapToObject() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
         Date today = new Date();
         LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
 
@@ -114,7 +116,8 @@ public class JUnitTest {
         linkedHashMap.put("age", 123123);
         linkedHashMap.put("updatedAt", today);
 
-        TestObject testObject = ConvertObject.mapToObject(linkedHashMap, TestObject.class);
+        TestObject testObject = ConvertObject.map2Object(linkedHashMap, TestObject.class);
+//        TestObject test1Object = objectMapper.convertValue(linkedHashMap, TestObject.class);
         TestObject targetObject = TestObject.builder()
                 .id("TEST_ID")
                 .name("TESTER")
@@ -122,5 +125,9 @@ public class JUnitTest {
                 .updatedAt(today)
                 .build();
         Assert.assertEquals(testObject, targetObject);
+
+        Map targetMap = ConvertObject.object2Map(targetObject);
+
+        System.out.println(targetMap);
     }
 }

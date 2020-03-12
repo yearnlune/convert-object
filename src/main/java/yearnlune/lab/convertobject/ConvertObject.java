@@ -22,27 +22,6 @@ public class ConvertObject {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static <T> T getInstance(Class<T> tClass) {
-        try {
-            return tClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            System.err.println("Object : " + tClass.toString());
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static <S, T> List<T> objectCollection2ObjectList(Collection<S> objectCollection, Class<T> tClass) {
-        List<T> tList = new ArrayList<>();
-        for (S s : objectCollection) {
-            T t = getInstance(tClass);
-            BeanUtils.copyProperties(s, t);
-            tList.add(t);
-        }
-
-        return tList;
-    }
-
     public static <T> T string2Object(String string, Class<T> tClass) {
         T t = null;
         try {
@@ -64,7 +43,7 @@ public class ConvertObject {
         return t;
     }
 
-    public static <T> List<T> stringToObjectList(String string, Class<T[]> tClass) {
+    public static <T> List<T> string2ObjectList(String string, Class<T[]> tClass) {
         try {
             return Arrays.asList(objectMapper.readValue(string, tClass));
 
@@ -94,15 +73,15 @@ public class ConvertObject {
         return t;
     }
 
-    public static <S, T> List<T> objectListToObjectList(List<S> objectList, Class<T> tClass) {
+    public static <S, T> List<T> objectList2ObjectList(List<S> objectList, Class<T> tClass) {
         return objectCollection2ObjectList(objectList, tClass);
     }
 
-    public static <S, T> List<T> objectSetToObjectList(Set<S> objectList, Class<T> tClass) {
+    public static <S, T> List<T> objectSet2ObjectList(Set<S> objectList, Class<T> tClass) {
         return objectCollection2ObjectList(objectList, tClass);
     }
 
-    public static <T> T mapToObject(Map map, Class<T> tClass) {
+    public static <T> T map2Object(Map map, Class<T> tClass) {
         T t = getInstance(tClass);
 
         for (Method method : tClass.getDeclaredMethods()) {
@@ -122,6 +101,31 @@ public class ConvertObject {
         }
 
         return t;
+    }
+
+    public static <T> Map object2Map(T t) {
+        return objectMapper.convertValue(t, Map.class);
+    }
+
+    private static <T> T getInstance(Class<T> tClass) {
+        try {
+            return tClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            System.err.println("Object : " + tClass.toString());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static <S, T> List<T> objectCollection2ObjectList(Collection<S> objectCollection, Class<T> tClass) {
+        List<T> tList = new ArrayList<>();
+        for (S s : objectCollection) {
+            T t = getInstance(tClass);
+            BeanUtils.copyProperties(s, t);
+            tList.add(t);
+        }
+
+        return tList;
     }
 
     private static <T> boolean isSetter(String methodName, Class<T> tClass) {
